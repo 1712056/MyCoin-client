@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -16,6 +18,8 @@ import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
 import Avatar from "@material-ui/core/Avatar";
 import Collapse from "@material-ui/core/Collapse";
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
 
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircle from "@material-ui/icons/AccountCircle";
@@ -25,11 +29,10 @@ import AssignmentIcon from "@material-ui/icons/Assignment";
 import AssignmentIndIcon from "@material-ui/icons/AssignmentInd";
 import HomeIcon from "@material-ui/icons/Home";
 
-
 import Logo from "./../icons/ethereum.png";
 import LogoText from "./../images/Logo.png";
 import imgDashboard from "./../images/dashboard.svg";
-import imgSend from './../images/send.svg';
+import imgSend from "./../images/send.svg";
 
 const drawerWidth = 240;
 
@@ -54,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    backgroundColor: "#f2f4fa",
   },
   drawerContainer: {
     overflow: "auto",
@@ -68,6 +72,10 @@ const useStyles = makeStyles((theme) => ({
   },
   nested: {
     paddingLeft: theme.spacing(4),
+  },
+  link: {
+    textDecoration: "none",
+    color: "inherit",
   },
 }));
 
@@ -143,6 +151,7 @@ export default function AppBarMyCoin(props) {
               border: "1px solid blue",
               marginRight: "10px",
             }}
+            
           >
             New wallet
           </Button>
@@ -161,57 +170,82 @@ export default function AppBarMyCoin(props) {
         <Toolbar />
         <div className={classes.drawerContainer}>
           <List>
-            <ListItem button>
-              <ListItemIcon>
-                <Avatar src={imgDashboard} />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItem>
-            <ListItem button onClick={handleClick}>
-              <ListItemIcon>
-                <Avatar src={imgSend} />
-              </ListItemIcon>
-              <ListItemText primary="Send" />
-              {open ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
+            <Link to="/" className={classes.link}>
+              <ListItem button>
+                <ListItemIcon>
+                  <Avatar src={imgDashboard} />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+            </Link>
+            
+              <ListItem button onClick={handleClick}>
+                <ListItemIcon>
+                  <Avatar src={imgSend} />
+                </ListItemIcon>
+                <ListItemText primary="Send" />
+                {open ? <ExpandLess /> : <ExpandMore />}
+              </ListItem>
+            
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemText primary="Send Transaction" />
-                </ListItem>
+                <Link to="/send-transaction" className={classes.link}>
+                  <ListItem button className={classes.nested}>
+                    <ListItemText primary="Send Transaction" />
+                  </ListItem>
+                </Link>
               </List>
               <List component="div" disablePadding>
-                <ListItem button className={classes.nested}>
-                  <ListItemText primary="Send Offline" />
-                </ListItem>
+                <Link to="/send-offline" className={classes.link}>
+                  <ListItem button className={classes.nested}>
+                    <ListItemText primary="Send Offline" />
+                  </ListItem>
+                </Link>
               </List>
             </Collapse>
           </List>
           <Divider />
           <List>
-          <ListItem button>
-              <ListItemIcon>
-              <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-              <AssignmentIcon />
-              </ListItemIcon>
-              <ListItemText primary="New wallet" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-              <AssignmentIndIcon />
-              </ListItemIcon>
-              <ListItemText primary="Access" />
-            </ListItem>
+            <Link to="/" className={classes.link}>
+              <ListItem button>
+                <ListItemIcon>
+                  <HomeIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+            </Link>
+            <Link to="/create-wallet" className={classes.link}>
+              <ListItem button>
+                <ListItemIcon>
+                  <AssignmentIcon />
+                </ListItemIcon>
+                <ListItemText primary="New Wallet" />
+              </ListItem>
+            </Link>
+            <Link to="/access-wallet" className={classes.link}>
+              <ListItem button>
+                <ListItemIcon>
+                  <AssignmentIndIcon />
+                </ListItemIcon>
+                <ListItemText primary="Access Wallet" />
+              </ListItem>
+            </Link>
           </List>
         </div>
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Paper></Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper></Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper></Paper>
+          </Grid>
+        </Grid>
         {props.children}
       </main>
       {renderMenu}

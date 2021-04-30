@@ -4,6 +4,10 @@ import './App.css';
 import { makeStyles } from "@material-ui/core/styles";
 
 import AppBar from './layout';
+import Dashboard from './pages/Dashboard';
+import CreateWallet from './pages/CreateWallet';
+import AccessWallet from './pages/AccessWallet';
+
 const useStyles = makeStyles((theme) => ({
     content: {
       padding: "2rem",
@@ -17,7 +21,9 @@ const App = ()=>{
         <Router>
             <AppBar>
             <Switch>
-              <Route path='/'/>
+              <Route exact path='/' component={Dashboard}/>
+              <Route exact path='/access-wallet' component={AccessWallet}/>
+              <Route exact path='/create-wallet' component={CreateWallet}/>
             </Switch>
             </AppBar>
         </Router>
