@@ -19,12 +19,13 @@ import imgNoShare from "./../images/no-share.svg";
 
 import { Link } from "react-router-dom";
 
+import AuthContext from './../context/auth/authContext';
 const useStyles = makeStyles((theme) => ({
   paper: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    margin: theme.spacing(2)
+    margin: theme.spacing(2),
   },
   avatar: {
     margin: theme.spacing(1),
@@ -41,26 +42,28 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       background: "#004c9edd",
     },
-    
   },
   image: {
     width: theme.spacing(7),
-    height: theme.spacing(7)
+    height: theme.spacing(7),
   },
   grid: {
-    backgroundColor:'#f2f4fa', 
+    backgroundColor: "#f2f4fa",
     margin: theme.spacing(1),
-    padding: theme.spacing(1)
-  }
+    padding: theme.spacing(1),
+  },
 }));
 
 export default function CreateWallet({ history }) {
+  const [next, setNext] = useState(false);
+  const authContext = useContext(AuthContext);
+  const {register}=authContext;
   const classes = useStyles();
   const [formData, setFormData] = useState({
     password: "",
   });
-
-  useEffect(() => {});
+  const {password}=formData;
+  useEffect(() => {}, [next]);
   // Handle input change
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -70,8 +73,17 @@ export default function CreateWallet({ history }) {
   const handleNext = async (e) => {
     e.preventDefault();
     if (formData.password !== null) {
+    const res = await register({password});
+    if(res){
+      setNext(true);
+      console.log(res);
+    }
     }
   };
+  //handle download keystore file
+  const handleDownload = async (e)=>{
+    e.preventDefault();
+  }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -90,103 +102,109 @@ export default function CreateWallet({ history }) {
           }}
         >
           <div className={classes.paper}>
-            <form className={classes.form}>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  helperText={"Please fill in this field."}
-                  name="password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  label={formData.password === "" ? "Password" : ""}
-                  value={formData.password}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Typography color="secondary">
-                  DO NOT FORGET to save your password. You will need this
-                  Password + Keystore File to unlock your wallet.
-                </Typography>
-              </Grid>
+            {next === false ? (
+              <form className={classes.form}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      required
+                      fullWidth
+                      helperText={"Please fill in this field."}
+                      name="password"
+                      type="password"
+                      id="password"
+                      label={formData.password === "" ? "Password" : ""}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography color="secondary">
+                      DO NOT FORGET to save your password. You will need this
+                      Password + Keystore File to unlock your wallet.
+                    </Typography>
+                  </Grid>
 
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                className={classes.submit}
-                onClick={handleNext}
-              >
-                Next
-              </Button>
-              <Grid container justify="flex-end">
-                <Grid item>
-                  <Link
-                    style={{ color: "inherit" }}
-                    to="/access-wallet"
-                    variant="body2"
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    className={classes.submit}
+                    onClick={handleNext}
                   >
-                    Already have an account? Access wallet
-                  </Link>
+                    Next
+                  </Button>
+                  <Grid container justify="flex-end">
+                    <Grid item>
+                      <Link
+                        style={{ color: "inherit" }}
+                        to="/access-wallet"
+                        variant="body2"
+                      >
+                        Already have an account? Access wallet
+                      </Link>
+                    </Grid>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </form>
-
-            <Typography component="h1" variant="h5">
-              Save My Keystore File
-            </Typography>
-            <Grid container className={classes.grid}>
-              <Grid item xs={4}>
-                <Avatar src={imgNoLose} className={classes.image}></Avatar>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography component="h1" variant="h6">
-                  Don't Lose It
+              </form>
+            ) : (
+              <div>
+                <Typography component="h1" variant="h5">
+                  Save My Keystore File
                 </Typography>
-                <div>Be careful, it can not be recovered if you lose it.</div>
-              </Grid>
-            </Grid>
-            <Grid container className={classes.grid}>
-              <Grid item xs={4}>
-                <Avatar src={imgNoShare} className={classes.image}></Avatar>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography component="h1" variant="h6">
-                  Don't Share It
-                </Typography>
-                <div>
-                  Your funds will be stolen if you use this file on a malicious
-                  phishing site.
-                </div>
-              </Grid>
-            </Grid>
-            <Grid container className={classes.grid}>
-              <Grid item xs={4}>
-                <Avatar src={imgBackup} className={classes.image}></Avatar>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography component="h1" variant="h6">
-                  Make a Backup
-                </Typography>
-                <div>
-                  Secure it like the millions of dollars it may one day be
-                  worth.
-                </div>
-              </Grid>
-            </Grid>
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                className={classes.submit}
-                onClick={handleNext}
-              >
-                Download Keystore File
-              </Button>
-
+                <Grid container className={classes.grid}>
+                  <Grid item xs={4}>
+                    <Avatar src={imgNoLose} className={classes.image}></Avatar>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography component="h1" variant="h6">
+                      Don't Lose It
+                    </Typography>
+                    <div>
+                      Be careful, it can not be recovered if you lose it.
+                    </div>
+                  </Grid>
+                </Grid>
+                <Grid container className={classes.grid}>
+                  <Grid item xs={4}>
+                    <Avatar src={imgNoShare} className={classes.image}></Avatar>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography component="h1" variant="h6">
+                      Don't Share It
+                    </Typography>
+                    <div>
+                      Your funds will be stolen if you use this file on a
+                      malicious phishing site.
+                    </div>
+                  </Grid>
+                </Grid>
+                <Grid container className={classes.grid}>
+                  <Grid item xs={4}>
+                    <Avatar src={imgBackup} className={classes.image}></Avatar>
+                  </Grid>
+                  <Grid item xs={8}>
+                    <Typography component="h1" variant="h6">
+                      Make a Backup
+                    </Typography>
+                    <div>
+                      Secure it like the millions of dollars it may one day be
+                      worth.
+                    </div>
+                  </Grid>
+                </Grid>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  className={classes.submit}
+                  onClick={handleDownload}
+                >
+                  Download Keystore File
+                </Button>
+              </div>
+            )}
           </div>
         </Paper>
       </div>
