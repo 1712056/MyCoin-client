@@ -18,7 +18,7 @@ const AuthState = (props) => {
   };
 
   const [state, dispatch] = useReducer(authReducer, initialState);
-
+  
   // Register User
   const register = async (formData) => {
     const config = {

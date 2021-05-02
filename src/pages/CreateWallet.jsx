@@ -8,6 +8,7 @@ import {
   Typography,
   Container,
 } from "@material-ui/core/";
+import Popup from 'reactjs-popup';
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 
@@ -16,6 +17,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import imgBackup from "./../images/make-a-backup.svg";
 import imgNoLose from "./../images/no-lose.svg";
 import imgNoShare from "./../images/no-share.svg";
+import iconSuccess from "./../icons/checked.png";
 
 import { Link } from "react-router-dom";
 
@@ -52,18 +54,31 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     padding: theme.spacing(1),
   },
+  popup:{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    width: "200%",
+    backgroundColor: '#989FCE'
+  },
 }));
 
 export default function CreateWallet({ history }) {
   const [next, setNext] = useState(false);
-  const authContext = useContext(AuthContext);
-  const {register}=authContext;
-  const classes = useStyles();
+  const [open,setOpen] = useState(false);
+  const close = ()=>setOpen(false);
+  const [keystore,setKeystore] = useState(''); 
   const [formData, setFormData] = useState({
     password: "",
   });
+  const authContext = useContext(AuthContext);
+  const {register}=authContext;
+  const classes = useStyles();
+  
   const {password}=formData;
-  useEffect(() => {}, [next]);
+  
   // Handle input change
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -72,18 +87,32 @@ export default function CreateWallet({ history }) {
   // Handle form submit
   const handleNext = async (e) => {
     e.preventDefault();
-    if (formData.password !== null) {
-    const res = await register({password});
-    if(res){
+    if (password !== null) {
+    let data = await register({password});
+    if(data){
       setNext(true);
-      console.log(res);
+      data = JSON.stringify(data,null,2);
+      console.log(data);
+      setKeystore(data);
     }
     }
   };
+
   //handle download keystore file
-  const handleDownload = async (e)=>{
+  const handleDownload = (e)=>{
     e.preventDefault();
+    if(keystore!==null) 
+    {
+      const blob = new Blob([keystore]);
+      console.log(blob);
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = `UTC-${+new Date()}`;
+      link.click(); 
+      setOpen(o=>!o);
+    }
   }
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -203,6 +232,20 @@ export default function CreateWallet({ history }) {
                 >
                   Download Keystore File
                 </Button>
+                <Popup open={open} modal
+                    lockScroll={true}
+                  nested onClose={close} >
+              <Paper elevation={3} variant="outlined" className={classes.popup}>
+                
+                <Avatar src={iconSuccess} className={classes.image}></Avatar>
+                <Typography variant="h5" style={{color:"#003945"}}>SUCCESS</Typography>
+                <Button type="submit"
+                  fullWidth
+                  variant="contained"
+                  className={classes.submit} onClick={(e)=>{e.preventDefault(); history.push('/access-wallet')}}>Access Wallet</Button>
+              </Paper>
+
+                </Popup>
               </div>
             )}
           </div>
