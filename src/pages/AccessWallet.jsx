@@ -57,13 +57,12 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     margin: theme.spacing(2),
     padding: theme.spacing(2),
-    
+    width: theme.spacing(50),
     backgroundColor: "#989FCE",
   },
 }));
 
 export default function AccessWallet() {
-  const [next, setNext] = useState(false);
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
   const [keystore, setKeystore] = useState("");
@@ -72,7 +71,7 @@ export default function AccessWallet() {
   });
   const history = useHistory();
   const authContext = useContext(AuthContext);
-  const { register } = authContext;
+  const { login } = authContext;
   const classes = useStyles();
 
   const { password } = formData;
@@ -83,31 +82,36 @@ export default function AccessWallet() {
   };
 
   // Handle form submit
-  const handleNext = async (e) => {
+  const handleAccess = async (e) => {
     e.preventDefault();
     if (password !== null) {
-      let data = await register({ password });
+      const data = await login(keystore, password);
       if (data) {
-        setNext(true);
-        data = JSON.stringify(data, null, 2);
         console.log(data);
-        setKeystore(data);
       }
     }
   };
 
-  //handle download keystore file
-  const handleDownload = (e) => {
-    e.preventDefault();
-    if (keystore !== null) {
-      const blob = new Blob([keystore]);
-      console.log(blob);
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `UTC-${+new Date()}`;
-      link.click();
-      setOpen((o) => !o);
+    
+  //handle change file
+  const handleChangeFile =(e)=>{
+    const file = e.target.files[0];
+    const fileData = new FileReader();
+    let fileloaded = e=>{
+      const fileContents = e.target.result;
+      if(fileContents!==null) {
+        setKeystore(fileContents);
+        setOpen(o=>!o);
+      }
     }
+    fileData.onload=fileloaded;
+    fileData.readAsText(file);
+  }
+
+  //handle download keystore file
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    document.getElementById('inputFile').click();
   };
 
   return (
@@ -170,12 +174,17 @@ export default function AccessWallet() {
               fullWidth
               variant="contained"
               className={classes.submit}
-              onClick={handleDownload}
+              onClick={handleUpload}
             >
               Continue
             </Button>
+            <input type="file" style={{display:"none"}} multiple={false}
+            accept=".json,.txt,application/json"
+            onChange={evt => handleChangeFile(evt)}
+            id="inputFile" ></input>
             <div className={classes.paper}>
             <Popup open={open} modal lockScroll={true} nested onClose={close}>
+            
                 
               <Paper elevation={3} variant="outlined" className={classes.popup}>
                 <Grid
@@ -220,13 +229,14 @@ export default function AccessWallet() {
                       fullWidth
                       variant="contained"
                       className={classes.submit}
-                      onClick={handleNext}
+                      onClick={handleAccess}
                     >
                       Access Wallet
                     </Button>
                   </Grid>
                 </form>
               </Paper>
+            
             </Popup>
             </div>
           </div>
