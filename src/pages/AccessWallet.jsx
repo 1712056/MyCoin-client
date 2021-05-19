@@ -19,6 +19,7 @@ import imgFile from "./../images/file.svg";
 import { Link, useHistory } from "react-router-dom";
 
 import AuthContext from "./../context/auth/authContext";
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     display: "flex",
@@ -87,7 +88,7 @@ export default function AccessWallet() {
     if (password !== null) {
       const data = await login(keystore, password);
       if (data) {
-        console.log(data);
+        history.push('/send-transaction');
       }
     }
   };

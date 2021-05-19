@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -33,6 +33,9 @@ import Logo from "./../icons/ethereum.png";
 import LogoText from "./../images/Logo.png";
 import imgDashboard from "./../images/dashboard.svg";
 import imgSend from "./../images/send.svg";
+
+import AuthContext from "./../context/auth/authContext";
+import { useHistory } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -81,6 +84,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AppBarMyCoin(props) {
   const classes = useStyles();
+  const authContext = useContext(AuthContext);
+  const isAuthenticated = authContext.isAuthenticated;
+  const { logout } = useContext(AuthContext);
+  const history = useHistory();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const handleProfileMenuOpen = (event) => {
@@ -95,7 +102,11 @@ export default function AppBarMyCoin(props) {
   const handleClick = () => {
     setOpen(!open);
   };
-
+  const handleLogout = () => {
+    logout();
+    history.push("/access-wallet");
+    setAnchorEl(null);
+  };
   const menuId = "primary-search-account-menu";
 
   const renderMenu = (
@@ -109,7 +120,7 @@ export default function AppBarMyCoin(props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Setting</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
+      <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   );
 
@@ -129,35 +140,42 @@ export default function AppBarMyCoin(props) {
           <Typography variant="h6" className={classes.title}>
             News
           </Typography>
-          <IconButton aria-label="show 11 new notifications">
-            <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon fontSize="large" />
-            </Badge>
-          </IconButton>
-          <IconButton
-            edge="end"
-            aria-label="account of current user"
-            aria-controls={menuId}
-            aria-haspopup="true"
-            onClick={handleProfileMenuOpen}
-          >
-            <AccountCircle fontSize="large" />
-          </IconButton>
-          <Button
-            variant="contained"
-            style={{
-              background: "white",
-              color: "blue",
-              border: "1px solid blue",
-              marginRight: "10px",
-            }}
-            
-          >
-            New wallet
-          </Button>
-          <Button variant="contained" color="primary">
-            Access
-          </Button>
+          {isAuthenticated ? (
+            <Grid>
+              <IconButton aria-label="show 11 new notifications">
+                <Badge badgeContent={11} color="secondary">
+                  <NotificationsIcon fontSize="large" />
+                </Badge>
+              </IconButton>
+              <IconButton
+                edge="end"
+                aria-label="account of current user"
+                aria-controls={menuId}
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+              >
+                <AccountCircle fontSize="large" />
+              </IconButton>
+            </Grid>
+          ) : (
+            <Grid>
+              <Button
+                variant="contained"
+                style={{
+                  background: "white",
+                  color: "blue",
+                  border: "1px solid blue",
+                  marginRight: "10px",
+                }}
+                onClick={()=>{history.push('./create-wallet')}}
+              >
+                New wallet
+              </Button>
+              <Button variant="contained" color="primary" onClick={()=>{history.push('./access-wallet')}}>
+                Access
+              </Button>
+            </Grid>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -169,16 +187,17 @@ export default function AppBarMyCoin(props) {
       >
         <Toolbar />
         <div className={classes.drawerContainer}>
-          <List>
-            <Link to="/" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <Avatar src={imgDashboard} />
-                </ListItemIcon>
-                <ListItemText primary="Dashboard" />
-              </ListItem>
-            </Link>
-            
+          {isAuthenticated ? (
+            <List>
+              <Link to="/" className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon>
+                    <Avatar src={imgDashboard} />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItem>
+              </Link>
+
               <ListItem button onClick={handleClick}>
                 <ListItemIcon>
                   <Avatar src={imgSend} />
@@ -186,51 +205,52 @@ export default function AppBarMyCoin(props) {
                 <ListItemText primary="Send" />
                 {open ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
-            
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <Link to="/send-transaction" className={classes.link}>
-                  <ListItem button className={classes.nested}>
-                    <ListItemText primary="Send Transaction" />
-                  </ListItem>
-                </Link>
-              </List>
-              <List component="div" disablePadding>
-                <Link to="/send-offline" className={classes.link}>
-                  <ListItem button className={classes.nested}>
-                    <ListItemText primary="Send Offline" />
-                  </ListItem>
-                </Link>
-              </List>
-            </Collapse>
-          </List>
-          <Divider />
-          <List>
-            <Link to="/" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Dashboard" />
-              </ListItem>
-            </Link>
-            <Link to="/create-wallet" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AssignmentIcon />
-                </ListItemIcon>
-                <ListItemText primary="New Wallet" />
-              </ListItem>
-            </Link>
-            <Link to="/access-wallet" className={classes.link}>
-              <ListItem button>
-                <ListItemIcon>
-                  <AssignmentIndIcon />
-                </ListItemIcon>
-                <ListItemText primary="Access Wallet" />
-              </ListItem>
-            </Link>
-          </List>
+
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <Link to="/send-transaction" className={classes.link}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemText primary="Send Transaction" />
+                    </ListItem>
+                  </Link>
+                </List>
+                <List component="div" disablePadding>
+                  <Link to="/send-offline" className={classes.link}>
+                    <ListItem button className={classes.nested}>
+                      <ListItemText primary="Send Offline" />
+                    </ListItem>
+                  </Link>
+                </List>
+              </Collapse>
+            </List>
+          ) : (
+            <List>
+              <Link to="/" className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon>
+                    <HomeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItem>
+              </Link>
+              <Link to="/create-wallet" className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon>
+                    <AssignmentIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="New Wallet" />
+                </ListItem>
+              </Link>
+              <Link to="/access-wallet" className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon>
+                    <AssignmentIndIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Access Wallet" />
+                </ListItem>
+              </Link>
+            </List>
+          )}
         </div>
       </Drawer>
       <main className={classes.content}>

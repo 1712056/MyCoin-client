@@ -7,6 +7,7 @@ import AppBar from "./layout";
 import Dashboard from "./pages/Dashboard";
 import CreateWallet from "./pages/CreateWallet";
 import AccessWallet from "./pages/AccessWallet";
+import SendTransaction from "./pages/SendTransaction";
 
 import AuthState from "./context/auth/AuthState";
 
@@ -27,6 +28,7 @@ const App = () => {
             <Route exact path="/" component={Dashboard} />
             <Route exact path="/access-wallet" component={AccessWallet} />
             <Route exact path="/create-wallet" component={CreateWallet} />
+            <Route exact path="/send-transaction" component={SendTransaction} />
           </Switch>
         </AppBar>
       </AuthState>
